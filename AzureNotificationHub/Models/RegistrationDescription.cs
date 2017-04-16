@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace AzureNotificationHub.Models
 {
@@ -23,5 +26,33 @@ namespace AzureNotificationHub.Models
         public string ExpirationTime { get; set; }
         public string RegistrationId { get; set; }
         public string Tags { get; set; }
+
+        public string[] TagsAsList
+        {
+            get
+            {
+                return Tags.Split(',');
+            }
+        }
+
+        public virtual RegistrationDescription Deserialize(IEnumerable<XElement> xml)
+        {
+            ETag = xml.FirstOrDefault(f => f.Name.LocalName == "ETag")?.Value;
+            ExpirationTime = xml.FirstOrDefault(f => f.Name.LocalName == "ExpirationTime")?.Value;
+            RegistrationId = xml.FirstOrDefault(f => f.Name.LocalName == "RegistrationId")?.Value;
+            Tags = xml.FirstOrDefault(f => f.Name.LocalName == "Tags")?.Value;
+
+            return this;
+        }
+
+        public virtual RegistrationDescription Deserialize(string xml)
+        {
+            return this;
+        }
+
+        public virtual string SerializeAsEntry()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

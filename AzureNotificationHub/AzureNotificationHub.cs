@@ -51,9 +51,26 @@ namespace AzureNotificationHub
 
             try
             {
-                HttpResponseMessage response = await hc.GetAsync("");
+                HttpResponseMessage response = await hc.GetAsync(string.Empty);
                 response.EnsureSuccessStatusCode();
                 return RegistrationList.Convert(await response.Content.ReadAsStringAsync());
+            }
+            catch (Exception e)
+            {
+                throw (new Exception("Error on service call", e));
+            }
+        }
+
+        public async Task<RegistrationDescription> CreateRegistration(RegistrationDescription registration)
+        {
+            HttpClient hc = GetClient("registrations");
+
+            try
+            {
+                HttpResponseMessage response = await hc.PostAsync(string.Empty, new StringContent(registration.SerializeAsEntry(), Encoding.UTF8, "application/atom+xml"));
+                response.EnsureSuccessStatusCode();
+
+                return registration.Deserialize(await response.Content.ReadAsStringAsync());
             }
             catch (Exception e)
             {
