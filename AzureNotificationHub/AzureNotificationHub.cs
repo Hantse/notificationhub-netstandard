@@ -12,6 +12,9 @@ namespace AzureNotificationHub
 {
     public class AzureNotificationHubClient
     {
+        /// <summary>
+        /// Hub SharedKey
+        /// </summary>
         public string SAS { get; set; }
 
         public string ServiceUrl { get; set; }
@@ -47,6 +50,11 @@ namespace AzureNotificationHub
         }
 
         #region Registration
+        /// <summary>
+        /// Retrieves all registrations with a specific tag.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
         public async Task<List<RegistrationDescription>> ReadAllRegistrationsWithTag(string tag)
         {
             HttpClient hc = GetClient($"tags/{tag}/registrations");
@@ -63,6 +71,10 @@ namespace AzureNotificationHub
             }
         }
 
+        /// <summary>
+        /// Retrieves all registrations.
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<RegistrationDescription>> ReadAllRegistrations()
         {
             HttpClient hc = GetClient("registrations");
@@ -79,7 +91,11 @@ namespace AzureNotificationHub
             }
         }
 
-
+        /// <summary>
+        /// Creates or updates a registration in the specified location.
+        /// </summary>
+        /// <param name="registration"></param>
+        /// <returns></returns>
         public async Task<RegistrationDescription> CreateOrUpdateRegistration(RegistrationDescription registration)
         {
             if (string.IsNullOrEmpty(registration.RegistrationId) || string.IsNullOrWhiteSpace(registration.RegistrationId))
@@ -92,6 +108,11 @@ namespace AzureNotificationHub
             }
         }
 
+        /// <summary>
+        /// Creates a new registration. This method generates a registration ID, which you can subsequently use to retrieve, update, and delete this registration.
+        /// </summary>
+        /// <param name="registration"></param>
+        /// <returns></returns>
         public async Task<RegistrationDescription> CreateRegistration(RegistrationDescription registration)
         {
             HttpClient hc = GetClient("registrations");
@@ -109,6 +130,11 @@ namespace AzureNotificationHub
             }
         }
 
+        /// <summary>
+        /// Updates an existing registration.
+        /// </summary>
+        /// <param name="registration"></param>
+        /// <returns></returns>
         public async Task<RegistrationDescription> UpdateRegistration(RegistrationDescription registration)
         {
             HttpClient hc = GetClient($"registrations/{registration.RegistrationId}");
@@ -126,6 +152,11 @@ namespace AzureNotificationHub
             }
         }
 
+        /// <summary>
+        /// Deletes a registration.
+        /// </summary>
+        /// <param name="registrationId"></param>
+        /// <returns></returns>
         public async Task<bool> DeleteRegistration(string registrationId)
         {
             HttpClient hc = GetClient($"registrations/{registrationId}");
@@ -144,6 +175,11 @@ namespace AzureNotificationHub
             }
         }
 
+        /// <summary>
+        /// Deletes a registration.
+        /// </summary>
+        /// <param name="registration"></param>
+        /// <returns></returns>
         public async Task<bool> DeleteRegistration(RegistrationDescription registration)
         {
             return await DeleteRegistration(registration.RegistrationId);
@@ -151,6 +187,59 @@ namespace AzureNotificationHub
         #endregion
 
         #region Send Notification
+
+        /// <summary>
+        /// Sends a notification directly to a device handle (a valid token as expressed by the Notification type). Users of this API do not need to use Registrations or Installations. Instead, users of this API manage all devices on their own and use Azure Notification Hub solely as a pass through service to communicate with the various Push Notification Services.
+        /// </summary>
+        /// <param name="notification"></param>
+        /// <param name="handle"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public async Task<string> DirectSend(NativeNotification notification, string handle, string tag = null)
+        {
+            HttpClient hc = GetClient($"messages/?direct");
+            hc.DefaultRequestHeaders.Add("ServiceBusNotification-DeviceHandle", handle);
+                
+            if (tag != null)
+            {
+                hc.DefaultRequestHeaders.Add("ServiceBusNotification-Tags", tag);
+            }
+
+            Type notificationType = notification.GetType();
+
+            if (notificationType == typeof(GcmNativeNotification))
+            {
+                hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                hc.DefaultRequestHeaders.Add("ServiceBusNotification-Format", "gcm");
+            }
+            else if (notificationType == typeof(ApnsNativeNotification))
+            {
+                hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                hc.DefaultRequestHeaders.Add("ServiceBusNotification-Format", "apple");
+            }
+            else
+            {
+                hc.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", " application/xml;charset=utf-8");
+            }
+
+            try
+            {
+                HttpResponseMessage response = await hc.PostAsync(string.Empty, new StringContent(JsonConvert.SerializeObject(notification)));
+                response.EnsureSuccessStatusCode();
+                return (response.Headers.Location?.ToString().Replace($"{ServiceUrl}/messages/", "").Replace($"?api-version=2015-01", ""));
+            }
+            catch (Exception e)
+            {
+                throw (new Exception("Error on service call", e));
+            }
+        }
+
+        /// <summary>
+        /// Sends a GCM native notification through a notification hub.
+        /// </summary>
+        /// <param name="notification"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
         public async Task<string> SendGcmNativeNotification(GcmNativeNotification notification, string tag = null)
         {
             HttpClient hc = GetClient($"messages");
@@ -164,6 +253,12 @@ namespace AzureNotificationHub
             return await SendNativeNotification(hc, notification);
         }
 
+        /// <summary>
+        /// Sends an APNS native notification through a notification hub.
+        /// </summary>
+        /// <param name="notification"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
         public async Task<string> SendApnsNativeNotification(ApnsNativeNotification notification, string tag = null)
         {
             HttpClient hc = GetClient($"messages");
