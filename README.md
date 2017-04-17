@@ -1,5 +1,6 @@
 # notificationhub-netstandard 1.6
 
+Nuget : https://www.nuget.org/packages/AzureNotificationHub.NETStandard/
 
 ## Current progression
 
