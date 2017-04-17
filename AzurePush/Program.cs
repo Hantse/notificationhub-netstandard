@@ -25,6 +25,10 @@ namespace AzurePush
                 GcmRegistrationId = "fFrO_1cEFA4:APA91bFM62iVOs6EsjB0qeWzdXjw0c2RAZABTB3k4-OkcX7QOLTFi7tp2DMPReQZnG3tgZBmnMytgh_sjnxfcftwTmOPluH4KpbH0sYO0hGpmArppcK1J94K-s4zXeL6CPe2CPi3kyHt",
                 Tags = "done"
             }).Result;
+
+            v.Tags = "1,7,9,7,4";
+            
+            var updated = ans.UpdateRegistration(v).Result;
         }
     }
 }

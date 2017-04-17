@@ -61,6 +61,18 @@ namespace AzureNotificationHub
             }
         }
 
+        public async Task<RegistrationDescription> CreateOrUpdateRegistration(RegistrationDescription registration)
+        {
+            if(string.IsNullOrEmpty(registration.RegistrationId) || string.IsNullOrWhiteSpace(registration.RegistrationId))
+            {
+                return await CreateRegistration(registration);
+            }
+            else
+            {
+                return await UpdateRegistration(registration);
+            }
+        }
+
         public async Task<RegistrationDescription> CreateRegistration(RegistrationDescription registration)
         {
             HttpClient hc = GetClient("registrations");
@@ -68,6 +80,23 @@ namespace AzureNotificationHub
             try
             {
                 HttpResponseMessage response = await hc.PostAsync(string.Empty, new StringContent(registration.SerializeAsEntry(), Encoding.UTF8, "application/atom+xml"));
+                response.EnsureSuccessStatusCode();
+
+                return registration.Deserialize(await response.Content.ReadAsStringAsync());
+            }
+            catch (Exception e)
+            {
+                throw (new Exception("Error on service call", e));
+            }
+        }
+
+        public async Task<RegistrationDescription> UpdateRegistration(RegistrationDescription registration)
+        {
+            HttpClient hc = GetClient($"registrations/{registration.RegistrationId}");
+
+            try
+            {
+                HttpResponseMessage response = await hc.PutAsync(string.Empty, new StringContent(registration.SerializeAsEntry(), Encoding.UTF8, "application/atom+xml"));
                 response.EnsureSuccessStatusCode();
 
                 return registration.Deserialize(await response.Content.ReadAsStringAsync());
