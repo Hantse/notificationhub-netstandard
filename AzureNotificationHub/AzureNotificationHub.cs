@@ -183,7 +183,7 @@ namespace AzureNotificationHub
             {
                 HttpResponseMessage response = await hc.PostAsync(string.Empty, new StringContent(JsonConvert.SerializeObject(notification), Encoding.UTF8, "application/json"));
                 response.EnsureSuccessStatusCode();
-                return (response.Headers.Location?.ToString().Replace("messages", ""));
+                return (response.Headers.Location?.ToString().Replace($"{ServiceUrl}/messages/", "").Replace($"?api-version=2015-01", ""));
             }
             catch (Exception e)
             {
