@@ -10,7 +10,9 @@ Nuget : https://www.nuget.org/packages/AzureNotificationHub.NETStandard/
 | Update Registration           |         V        |           V          |                    |                        |
 | Create or Update Registration |         V        |           V          |                    |                        |
 | Readall Registration          |         V        |           V          |                    |                        |
-|                               |                  |                      |                    |                        |
+| Direct Send                   |         V        |                      |                    |                        |
+| Send native                   |         V        |                      |                    |                        |
+
 
 ## Basic usage
 
