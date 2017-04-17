@@ -10,7 +10,7 @@ namespace AzureNotificationHub.Security
         public static string CreateToken(string resourceUri, string keyName, string key)
         {
             TimeSpan sinceEpoch = DateTime.UtcNow - new DateTime(1970, 1, 1);
-            var expiry = Convert.ToString((int)sinceEpoch.TotalSeconds + 3600); //EXPIRES in 1h 
+            var expiry = Convert.ToString((int)sinceEpoch.TotalSeconds + (3600 * 24)); //EXPIRES in 1h 
             string stringToSign = Uri.EscapeDataString(resourceUri) + "\n" + expiry;
             HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes(key));
 

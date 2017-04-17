@@ -45,6 +45,19 @@ namespace AzureNotificationHub.Models
             return this;
         }
 
+        public void addTag(string tag)
+        {
+            if (tag.IndexOfAny(new char[] { '*', '&', '#', '\'', '"', ')', '(' }) > -1)
+                throw new Exception("Invalid tag"); 
+
+            if(Tags.Length > 0)
+            {
+                Tags += ",";
+            }
+
+            Tags += tag;
+        }
+
         public virtual RegistrationDescription Deserialize(string xml)
         {
             return this;

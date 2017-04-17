@@ -1,6 +1,7 @@
 ﻿using AzureNotificationHub.Converters;
 using AzureNotificationHub.Models;
 using AzureNotificationHub.Security;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -45,6 +46,23 @@ namespace AzureNotificationHub
             return hc;
         }
 
+        #region Registration
+        public async Task<List<RegistrationDescription>> ReadAllRegistrationsWithTag(string tag)
+        {
+            HttpClient hc = GetClient($"tags/{tag}/registrations");
+
+            try
+            {
+                HttpResponseMessage response = await hc.GetAsync(string.Empty);
+                response.EnsureSuccessStatusCode();
+                return RegistrationList.Convert(await response.Content.ReadAsStringAsync());
+            }
+            catch (Exception e)
+            {
+                throw (new Exception("Error on service call", e));
+            }
+        }
+
         public async Task<List<RegistrationDescription>> ReadAllRegistrations()
         {
             HttpClient hc = GetClient("registrations");
@@ -61,9 +79,10 @@ namespace AzureNotificationHub
             }
         }
 
+
         public async Task<RegistrationDescription> CreateOrUpdateRegistration(RegistrationDescription registration)
         {
-            if(string.IsNullOrEmpty(registration.RegistrationId) || string.IsNullOrWhiteSpace(registration.RegistrationId))
+            if (string.IsNullOrEmpty(registration.RegistrationId) || string.IsNullOrWhiteSpace(registration.RegistrationId))
             {
                 return await CreateRegistration(registration);
             }
@@ -106,5 +125,71 @@ namespace AzureNotificationHub
                 throw (new Exception("Error on service call", e));
             }
         }
+
+        public async Task<bool> DeleteRegistration(string registrationId)
+        {
+            HttpClient hc = GetClient($"registrations/{registrationId}");
+            hc.DefaultRequestHeaders.Add("If-Match", "*");
+
+            try
+            {
+                HttpResponseMessage response = await hc.DeleteAsync(string.Empty);
+                response.EnsureSuccessStatusCode();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw (new Exception("Error on service call", e));
+            }
+        }
+
+        public async Task<bool> DeleteRegistration(RegistrationDescription registration)
+        {
+            return await DeleteRegistration(registration.RegistrationId);
+        }
+        #endregion
+
+        #region Send Notification
+        public async Task<string> SendGcmNativeNotification(GcmNativeNotification notification, string tag = null)
+        {
+            HttpClient hc = GetClient($"messages");
+            hc.DefaultRequestHeaders.Add("ServiceBusNotification-Format", "gcm");
+
+            if (tag != null)
+            {
+                hc.DefaultRequestHeaders.Add("ServiceBusNotification-Tags", tag);
+            }
+
+            return await SendNativeNotification(hc, notification);
+        }
+
+        public async Task<string> SendApnsNativeNotification(ApnsNativeNotification notification, string tag = null)
+        {
+            HttpClient hc = GetClient($"messages");
+            hc.DefaultRequestHeaders.Add("ServiceBusNotification-Format", "apple");
+
+            if (tag != null)
+            {
+                hc.DefaultRequestHeaders.Add("ServiceBusNotification-Tags", tag);
+            }
+
+            return await SendNativeNotification(hc, notification);
+        }
+
+        private async Task<string> SendNativeNotification(HttpClient hc, NativeNotification notification)
+        {
+            try
+            {
+                HttpResponseMessage response = await hc.PostAsync(string.Empty, new StringContent(JsonConvert.SerializeObject(notification), Encoding.UTF8, "application/json"));
+                response.EnsureSuccessStatusCode();
+                return (response.Headers.Location?.ToString().Replace("messages", ""));
+            }
+            catch (Exception e)
+            {
+                throw (new Exception("Error on service call", e));
+            }
+        }
+        #endregion
     }
 }
