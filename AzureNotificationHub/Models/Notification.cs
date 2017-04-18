@@ -4,7 +4,8 @@ using System.Text;
 
 namespace AzureNotificationHub.Models
 {
-    public class NativeNotification
+    public class Notification
     {
+
     }
 }

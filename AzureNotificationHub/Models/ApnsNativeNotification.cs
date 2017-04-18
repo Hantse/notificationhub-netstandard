@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AzureNotificationHub.Models
 {
-    public class ApnsNativeNotification : NativeNotification
+    public class ApnsNativeNotification : Notification
     {
         [JsonProperty("aps")]
         public dynamic Aps { get; set; }

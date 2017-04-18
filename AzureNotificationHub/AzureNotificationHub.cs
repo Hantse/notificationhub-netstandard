@@ -235,17 +235,39 @@ namespace AzureNotificationHub
         /// Creates or overwrites an installation.
         /// </summary>
         /// <returns></returns>
-        public async Task<string> CreateOrOverwriteInstallation()
+        public async Task<string> CreateOrOverwriteInstallation(Installation installation)
         {
-            return null;
+            HttpClient hc = GetClient($"installations/{installation?.InstallationId}");
+
+            try
+            {
+                HttpResponseMessage response = await hc.PutAsync(string.Empty, new StringContent(JsonConvert.SerializeObject(installation), Encoding.UTF8, "application/json"));
+                response.EnsureSuccessStatusCode();
+                return (response.Headers.Location?.ToString().Replace($"{ServiceUrl}/installations/", ""));
+            }
+            catch (Exception e)
+            {
+                throw (new Exception("Error on service call", e));
+            }
         }
         /// <summary>
         /// Retrieves installations based on Installation ID.
         /// </summary>
         /// <returns></returns>
-        public async Task<string> ReadInstallation()
+        public async Task<Installation> ReadInstallation(string installationId)
         {
-            return null;
+            HttpClient hc = GetClient($"installations/{installationId}");
+
+            try
+            {
+                HttpResponseMessage response = await hc.GetAsync(string.Empty);
+                response.EnsureSuccessStatusCode();
+                return JsonConvert.DeserializeObject<Installation>(await response.Content.ReadAsStringAsync());
+            }
+            catch (Exception e)
+            {
+                throw (new Exception("Error on service call", e));
+            }
         }
         /// <summary>
         /// Azure Notification Hubs supports partial updates to an installation using the JSON-Patch standard in RFC6902.
@@ -259,9 +281,21 @@ namespace AzureNotificationHub
         /// Deletes an installation.
         /// </summary>
         /// <returns></returns>
-        public async Task<string> DeleteInstallation()
+        public async Task<bool> DeleteInstallation(string installationId)
         {
-            return null;
+            HttpClient hc = GetClient($"installations/{installationId}");
+
+            try
+            {
+                HttpResponseMessage response = await hc.DeleteAsync(string.Empty);
+                response.EnsureSuccessStatusCode();
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw (new Exception("Error on service call", e));
+            }
+
         }
 
         #endregion
@@ -276,7 +310,7 @@ namespace AzureNotificationHub
         /// <param name="handle"></param>
         /// <param name="tag"></param>
         /// <returns></returns>
-        public async Task<string> DirectSend(NativeNotification notification, string handle, string tag = null)
+        public async Task<string> DirectSend(Notification notification, string handle, string tag = null)
         {
             HttpClient hc = GetClient($"messages/?direct");
             hc.DefaultRequestHeaders.Add("ServiceBusNotification-DeviceHandle", handle);
@@ -359,34 +393,72 @@ namespace AzureNotificationHub
         /// Sends an MPNS native notification through a notification hub.
         /// </summary>
         /// <returns></returns>
-        public async Task<string> SendMpnsNativeNotification()
+        public async Task<string> SendMpnsNativeNotification(WindowsNativeNotification notification, string tag = null)
         {
-            return null;
+            HttpClient hc = GetClient($"messages");
+            hc.DefaultRequestHeaders.Add("ServiceBusNotification-Format", "windowsphone");
+
+            if (tag != null)
+            {
+                hc.DefaultRequestHeaders.Add("ServiceBusNotification-Tags", tag);
+            }
+
+            return await SendNativeNotification(hc, notification);
         }
 
         /// <summary>
         /// Sends an WNS native notification through a notification hub.
         /// </summary>
         /// <returns></returns>
-        public async Task<string> SendWnsNativeNotification()
+        public async Task<string> SendWindowsNativeNotification(WindowsNativeNotification notification, string tag = null)
         {
-            return null;
+            HttpClient hc = GetClient($"messages");
+            hc.DefaultRequestHeaders.Add("ServiceBusNotification-Format", "windows");
+
+            if (tag != null)
+            {
+                hc.DefaultRequestHeaders.Add("ServiceBusNotification-Tags", tag);
+            }
+
+            return await SendNativeNotification(hc, notification);
         }
 
         /// <summary>
         /// Sends a notification to a template registration on a notification hub.
         /// </summary>
         /// <returns></returns>
-        public async Task<string> SendTemplateNotification()
+        public async Task<string> SendTemplateNotification(TemplateNotification notification, string tag = null)
         {
-            return null;
-        }
+            HttpClient hc = GetClient($"messages");
 
-        private async Task<string> SendNativeNotification(HttpClient hc, NativeNotification notification)
-        {
+            if (tag != null)
+            {
+                hc.DefaultRequestHeaders.Add("ServiceBusNotification-Tags", tag);
+            }
+
             try
             {
-                HttpResponseMessage response = await hc.PostAsync(string.Empty, new StringContent(JsonConvert.SerializeObject(notification), Encoding.UTF8, "application/json"));
+                HttpResponseMessage response = await hc.PostAsync(string.Empty, new StringContent(notification.PayLoad, Encoding.UTF8, "application/json"));
+                response.EnsureSuccessStatusCode();
+                return (response.Headers.Location?.ToString().Replace($"{ServiceUrl}/messages/", "").Replace($"?api-version=2015-01", ""));
+            }
+            catch (Exception e)
+            {
+                throw (new Exception("Error on service call", e));
+            }
+        }
+
+        private async Task<string> SendNativeNotification(HttpClient hc, Notification notification)
+        {
+            HttpResponseMessage response;
+
+            try
+            {
+                if (notification.GetType() == typeof(WindowsNativeNotification) || notification.GetType() == typeof(MpnsNativeNotification))
+                    response = await hc.PostAsync(string.Empty, new StringContent(((WindowsNativeNotification)notification).PayLoad, Encoding.UTF8, "application/xml"));
+                else
+                    response = await hc.PostAsync(string.Empty, new StringContent(JsonConvert.SerializeObject(notification), Encoding.UTF8, "application/json"));
+
                 response.EnsureSuccessStatusCode();
                 return (response.Headers.Location?.ToString().Replace($"{ServiceUrl}/messages/", "").Replace($"?api-version=2015-01", ""));
             }

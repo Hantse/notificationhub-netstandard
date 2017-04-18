@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AzureNotificationHub.Models
 {
-    public class GcmNativeNotification : NativeNotification
+    public class GcmNativeNotification : Notification
     {
         [JsonProperty("collapse_key")]
         private string CollapseKey { get; set; }

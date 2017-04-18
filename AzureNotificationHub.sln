@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureNotificationHub", "AzureNotificationHub\AzureNotificationHub.csproj", "{3CA5219E-CD5C-4B60-8A49-EF0E1973850A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{BE858929-FB77-4FBD-A5FF-922ECB742C5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{3CA5219E-CD5C-4B60-8A49-EF0E1973850A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CA5219E-CD5C-4B60-8A49-EF0E1973850A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CA5219E-CD5C-4B60-8A49-EF0E1973850A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE858929-FB77-4FBD-A5FF-922ECB742C5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE858929-FB77-4FBD-A5FF-922ECB742C5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE858929-FB77-4FBD-A5FF-922ECB742C5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE858929-FB77-4FBD-A5FF-922ECB742C5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

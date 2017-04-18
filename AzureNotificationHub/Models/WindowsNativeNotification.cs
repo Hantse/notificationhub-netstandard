@@ -5,21 +5,22 @@ using System.Xml;
 
 namespace AzureNotificationHub.Models
 {
-    public class MpnsNativeNotification : Notification
+    public class WindowsNativeNotification : Notification
     {
         public string PayLoad { get; set; }
 
-        public MpnsNativeNotification()
+        public WindowsNativeNotification()
         {
 
         }
 
-        public MpnsNativeNotification(string payLoad)
+
+        public WindowsNativeNotification(string payLoad)
         {
             PayLoad = payLoad;
         }
 
-        public MpnsNativeNotification(XmlDocument payLoad)
+        public WindowsNativeNotification(XmlDocument payLoad)
         {
             PayLoad = payLoad.OuterXml;
         }
