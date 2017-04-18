@@ -49,6 +49,50 @@ namespace AzureNotificationHub
             return hc;
         }
 
+        #region HubManagement
+        // TODO Create hub
+        public async Task<bool> CreateHub()
+        {
+            return true;
+        }
+        // TODO Create hub
+        public async Task<bool> ReadHub()
+        {
+            return true;
+        }
+        // TODO Update hub
+        public async Task<bool> UpdateHub()
+        {
+            return true;
+        }
+        // TODO Update hub
+        public async Task<bool> DeleteHub()
+        {
+            return true;
+        }
+        #endregion
+
+        #region Namespace PNS Credentials
+        /// <summary>
+        /// The namespace level Push Notification Services (PNS) APIs are designed for large apps that span across multiple hubs. They enable developers to easily read and update unified PNS settings for multiple hubs under the same namespace at once. When PNS credentials have been set at namespace level using this endpoint, all hubs in the namespace will use the credentials provided with the namespace settings. Hub creations in the namespace with PNS credentials won’t be allowed.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> CreateOrUpdatePNSCredentials()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// The namespace level Push Notification Services (PNS) APIs are designed for large apps that span across multiple hubs. They enable developers to easily read and update unified PNS settings for multiple hubs under the same namespace at once. When PNS credentials have been set at namespace level using this endpoint, all hubs in the namespace will use the credentials provided with the namespace settings. Hub creations in the namespace with PNS credentials won’t be allowed. When PNS credentials are set at hub level first, this endpoint will no longer be available.
+        /// This topic is a reference for getting the unified PNS credentials for a namespace.When PNS credentials are set at hub level first, this endpoint will no longer be available.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> ReadPNSCredentials()
+        {
+            return true;
+        }
+        #endregion
+
         #region Registration
         /// <summary>
         /// Retrieves all registrations with a specific tag.
@@ -186,10 +230,47 @@ namespace AzureNotificationHub
         }
         #endregion
 
+        #region Installation
+        /// <summary>
+        /// Creates or overwrites an installation.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> CreateOrOverwriteInstallation()
+        {
+            return null;
+        }
+        /// <summary>
+        /// Retrieves installations based on Installation ID.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> ReadInstallation()
+        {
+            return null;
+        }
+        /// <summary>
+        /// Azure Notification Hubs supports partial updates to an installation using the JSON-Patch standard in RFC6902.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> UpdateInstallation()
+        {
+            return null;
+        }
+        /// <summary>
+        /// Deletes an installation.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> DeleteInstallation()
+        {
+            return null;
+        }
+
+        #endregion
+
         #region Send Notification
 
         /// <summary>
         /// Sends a notification directly to a device handle (a valid token as expressed by the Notification type). Users of this API do not need to use Registrations or Installations. Instead, users of this API manage all devices on their own and use Azure Notification Hub solely as a pass through service to communicate with the various Push Notification Services.
+        /// In Standard Hub and ID is return.
         /// </summary>
         /// <param name="notification"></param>
         /// <param name="handle"></param>
@@ -199,7 +280,7 @@ namespace AzureNotificationHub
         {
             HttpClient hc = GetClient($"messages/?direct");
             hc.DefaultRequestHeaders.Add("ServiceBusNotification-DeviceHandle", handle);
-                
+
             if (tag != null)
             {
                 hc.DefaultRequestHeaders.Add("ServiceBusNotification-Tags", tag);
@@ -236,6 +317,7 @@ namespace AzureNotificationHub
 
         /// <summary>
         /// Sends a GCM native notification through a notification hub.
+        /// In Standard Hub and ID is return.
         /// </summary>
         /// <param name="notification"></param>
         /// <param name="tag"></param>
@@ -255,6 +337,7 @@ namespace AzureNotificationHub
 
         /// <summary>
         /// Sends an APNS native notification through a notification hub.
+        /// In Standard Hub and ID is return.
         /// </summary>
         /// <param name="notification"></param>
         /// <param name="tag"></param>
@@ -270,6 +353,33 @@ namespace AzureNotificationHub
             }
 
             return await SendNativeNotification(hc, notification);
+        }
+
+        /// <summary>
+        /// Sends an MPNS native notification through a notification hub.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> SendMpnsNativeNotification()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Sends an WNS native notification through a notification hub.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> SendWnsNativeNotification()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Sends a notification to a template registration on a notification hub.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> SendTemplateNotification()
+        {
+            return null;
         }
 
         private async Task<string> SendNativeNotification(HttpClient hc, NativeNotification notification)
