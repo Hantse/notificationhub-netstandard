@@ -33,13 +33,6 @@ namespace AzureNotificationHub.Models
             return this;
         }
 
-        public override RegistrationDescription Deserialize(string xml)
-        {
-            XDocument doc = XDocument.Parse(xml);
-
-            return Deserialize(doc.Elements().FirstOrDefault(f => f.Name.LocalName == "entry").Elements().FirstOrDefault(f => f.Name.LocalName == "content").Descendants());
-        }
-
         public override string SerializeAsEntry()
         {
             XmlDocument doc = new XmlDocument();

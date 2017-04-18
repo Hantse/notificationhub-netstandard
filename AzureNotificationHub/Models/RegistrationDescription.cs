@@ -60,7 +60,9 @@ namespace AzureNotificationHub.Models
 
         public virtual RegistrationDescription Deserialize(string xml)
         {
-            return this;
+            XDocument doc = XDocument.Parse(xml);
+
+            return Deserialize(doc.Elements().FirstOrDefault(f => f.Name.LocalName == "entry").Elements().FirstOrDefault(f => f.Name.LocalName == "content").Descendants());
         }
 
         public virtual string SerializeAsEntry()
