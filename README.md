@@ -14,14 +14,15 @@ Nuget : https://www.nuget.org/packages/AzureNotificationHub.NETStandard/
 | Send native                   |         V        |                      |                    |                        |
 
 
-|                               | WNS Registration | WNS Registration (T) |
-|-------------------------------|------------------|----------------------|
-| Create Registration           |         V        |           V          |
-| Update Registration           |         V        |           V          |
-| Create or Update Registration |         V        |           V          |
-| Readall Registration          |         V        |           V          |
-| Direct Send                   |                  |                      |                                         
-| Send native                   |                  |                      |               
+
+|                               | WNS Registration | WNS Registration (T) | MPNS Registration  | MPNS Registration (T)  |  
+|-------------------------------|------------------|----------------------|--------------------|------------------------|
+| Create Registration           |         V        |           V          |                    |                        |  
+| Update Registration           |         V        |           V          |                    |                        |
+| Create or Update Registration |         V        |           V          |                    |                        |  
+| Readall Registration          |         V        |           V          |                    |                        |
+| Direct Send                   |                  |                      |                    |                        |
+| Send native                   |                  |                      |                    |                        |
 
 
 
